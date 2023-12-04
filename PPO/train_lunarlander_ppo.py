@@ -31,13 +31,13 @@ def train():
     action_dim = env.action_space.n
 
     # Setup logging directory
-    log_dir = "training_logs1"
+    log_dir = "training_logs"
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)  # Create the directory if it doesn't exist
     log_f_name = log_dir + "/training_log.csv"  # Log file name
 
     # Setup model saving directory
-    directory = "models1"
+    directory = "models"
     if not os.path.exists(directory):
         os.makedirs(directory)  # Create the directory if it doesn't exist
     checkpoint_path = directory + "/LunarLander_ppo_weights.pth"  # Checkpoint file path

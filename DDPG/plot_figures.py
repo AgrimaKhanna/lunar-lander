@@ -1,29 +1,37 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import os
 
-
-def simple_plot(rewards, mean_rewards, epoch):
-    plt.clf()
-    plt.title('Training...')
-    plt.xlabel('Number of Episodes')
-    plt.ylabel('Reward')
-    plt.plot(rewards)
-    plt.plot(mean_rewards)
-    plt.text(len(rewards) - 1, rewards[-1], str(rewards[-1]))
-    plt.text(len(mean_rewards) - 1, mean_rewards[-1], str(mean_rewards[-1]))
-    if epoch % 10 == 0:
-        plt.show()
-
-def plot_learning_curve(x, rewards, figure_file, algo, env_id):
-
-    if not os.path.exists('./training_logs'):
-        os.makedirs('./training_logs')
-
-    running_avg = np.zeros(len(rewards))
-    for i in range(len(running_avg)):
-        running_avg[i] = np.mean(rewards[max(0, i - 100):(i + 1)])
-    plt.plot(x, running_avg)
-    plt.title(f'{algo} {env_id} Average 100 rewards')
-    plt.savefig(figure_file)
+def plot_training_rewards(file_path):
+    df = pd.read_csv('training_logs/training_log.csv', header=0)
+    rewards = df['reward'].to_numpy()
+    running_mean_rewards = df[' 100-episode running mean reward'].to_numpy()
+    episodes = df['episode'].to_numpy()
+    plt.plot(episodes, rewards, label='reward')
+    plt.plot(episodes, running_mean_rewards, label='100-episode running mean reward')
+    plt.xlabel('episode')
+    plt.ylabel('reward')
+    plt.legend()
+    plt.savefig(file_path)
     plt.close()
+
+
+def plot_testing_rewards(file_path):
+
+    df = pd.read_csv('testing_logs/testing_log.csv', header=0)
+    rewards = df['reward'].to_numpy()
+    episodes = df['episode'].to_numpy()
+    plt.plot(episodes, rewards, label='reward')
+    plt.xlabel('episode')
+    plt.ylabel('reward')
+    plt.legend()
+    plt.savefig(file_path)
+    plt.close()
+
+if __name__ == '__main__':
+    plot_dir = "plots"
+    if not os.path.exists(plot_dir):
+        os.makedirs(plot_dir)
+    plot_training_rewards("plots/training_log.png")
+    plot_testing_rewards("plots/testing_log.png")

@@ -1,25 +1,37 @@
 import matplotlib.pyplot as plt
-import pandas as pd
 import numpy as np
+import pandas as pd
+import os
 
-def train_plot():
-
-    df = pd.read_csv('training_log.csv')
-    plt.plot('x', 'Score', data=df, marker='', color='blue', linewidth=2, label='Score')
-    plt.plot('x', 'Average Score', data=df, marker='', color='orange', linewidth=2, linestyle='dashed',
-             label='AverageScore')
-    plt.plot('x', 'Solved Requirement', data=df, marker='', color='red', linewidth=2, linestyle='dashed',
-             label='Solved Requirement')
+def plot_training_rewards(file_path):
+    df = pd.read_csv('training_logs/training_log.csv', header=0)
+    rewards = df['reward'].to_numpy()
+    running_mean_rewards = df[' 100-episode running mean reward'].to_numpy()
+    episodes = df['episode'].to_numpy()
+    plt.plot(episodes, rewards, label='reward')
+    plt.plot(episodes, running_mean_rewards, label='100-episode running mean reward')
+    plt.xlabel('episode')
+    plt.ylabel('reward')
     plt.legend()
-    plt.savefig('training_log.png')
-def test_plot():
+    plt.savefig(file_path)
+    plt.close()
 
-    df = pd.read_csv('testing_log.csv')
-    plt.plot('x', 'Score', data=df, marker='', color='blue', linewidth=2, label='Score')
-    plt.plot('x', 'Average Score', data=df, marker='', color='orange', linewidth=2, linestyle='dashed',
-             label='AverageScore')
-    plt.plot('x', 'Solved Requirement', data=df, marker='', color='red', linewidth=2, linestyle='dashed',
-             label='Solved Requirement')
+
+def plot_testing_rewards(file_path):
+
+    df = pd.read_csv('testing_logs/testing_log.csv', header=0)
+    rewards = df['reward'].to_numpy()
+    episodes = df['episode'].to_numpy()
+    plt.plot(episodes, rewards, label='reward')
+    plt.xlabel('episode')
+    plt.ylabel('reward')
     plt.legend()
-    plt.savefig('testing_log.png')
+    plt.savefig(file_path)
+    plt.close()
 
+if __name__ == '__main__':
+    plot_dir = "plots"
+    if not os.path.exists(plot_dir):
+        os.makedirs(plot_dir)
+    plot_training_rewards("plots/training_log.png")
+    plot_testing_rewards("plots/testing_log.png")

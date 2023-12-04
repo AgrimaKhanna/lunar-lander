@@ -4,18 +4,17 @@ from datetime import datetime
 import gym
 import numpy as np
 import torch
-from ddpg_agent import Agent  # Ensure this is correctly imported
-from plot_figures import plot_learning_curve  # Ensure this is correctly imported
+import warnings
+from ddpg_agent import Agent
 import os
 
+warnings.filterwarnings("ignore")
 # Display the device being used
-device = torch.cuda.is_available()
-print("Using {} device".format(os.environ.get('DEVICE') if device else "cpu"))
+device = "cpu"
 
 # Hyperparameters
 num_episodes = 1000
 load_checkpoint = False
-num_iterations = 3
 success_threshold = 200.0
 environment_name = 'LunarLanderContinuous-v2'
 env = gym.make(environment_name)
@@ -42,17 +41,11 @@ agent = Agent(policy_lr=agent_args['policy_learning_rate'],
               hidden_dims=agent_args['hidden_layers'],
               n_actions=env.action_space.shape[0])
 
-def train_agent(iteration):
-    """
-    Function to train the agent.
-    :param iteration: Iteration number for multiple training sessions.
-    """
-    figure_filename = f"{agent.algo}_{environment_name}_{num_episodes}episodes_{iteration}.png"
-    figure_file = f'plots/{figure_filename}'
-
+def train_agent():
     best_score = env.reward_range[0]
     score_history = []
     total_training_time = []
+    running_mean_100 = []
     avg_scores = []
     eps_critic_losses, eps_actor_losses = [], []
 
@@ -75,6 +68,7 @@ def train_agent(iteration):
                 env.render()
 
             action = agent.choose_action(state)
+            action = np.squeeze(action)
             next_state, reward, done, _, _ = env.step(action)
             steps += 1
             agent.store_transition(state, action, reward, next_state, done)
@@ -90,8 +84,10 @@ def train_agent(iteration):
             state = next_state
 
         score_history.append(score)
-        avg_score = np.mean(score_history[-100:])
+        mean_100 = np.mean(score_history[-100:])
+        avg_score = np.mean(score_history)
         avg_scores.append(avg_score)
+        running_mean_100.append(mean_100)
         eps_critic_losses.append(episode_critic_loss)
         eps_actor_losses.append(episode_actor_loss)
 
@@ -101,28 +97,24 @@ def train_agent(iteration):
         start_time = end_time
         total_training_time.append(training_time)
 
-        if avg_score > best_score:
-            best_score = avg_score
+        if mean_100 > best_score:
+            best_score = mean_100
             agent.save_models()
-        if avg_score >= success_threshold:
-            print(f'100 Episodes Average: {avg_score:.1f}')
-            agent.save_weights(f"lunarlander_ddpg_actor_weights_khanna8.pth",
-                               f"lunarlander_ddpg_critic_weights_khanna8.pth")
+
+        if best_score >= success_threshold:
+            print(f'100 Episodes Average: {mean_100:.1f}')
             break
 
         print(f'Episode {episode}: Reward {score:.1f}')
 
+
     # Save training log to CSV file
-    csv_filename = f"{datetime.now()}training_log{episode}.csv"
+    csv_filename = "training_logs/training_log.csv"
     with open(csv_filename, "w+") as wf:
         writer = csv.writer(wf)
-        writer.writerow(['Reward', 'Average Score', 'Critic Loss', 'Actor Loss', 'Training Time'])
+        writer.writerow(['Episode','Reward', 'Average Score', '100-episode Running Mean','Critic Loss', 'Actor Loss', 'Training Time'])
         for idx in range(len(score_history)):
-            writer.writerow([score_history[idx], avg_scores[idx], eps_critic_losses[idx], eps_actor_losses[idx], total_training_time[idx]])
-
-    if not load_checkpoint:
-        plot_learning_curve(range(1, len(score_history) + 1), score_history, figure_file, agent.algo, environment_name)
+            writer.writerow([idx, score_history[idx], avg_scores[idx], running_mean_100[idx], eps_critic_losses[idx], eps_actor_losses[idx], total_training_time[idx]])
 
 if __name__ == '__main__':
-    for iteration in range(num_iterations):
-        train_agent(iteration + 1)
+    train_agent()
