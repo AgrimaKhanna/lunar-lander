@@ -29,7 +29,7 @@ agent = Agent(**agent_args)
 agent.load_models()  # This assumes you have already trained and saved your model
 
 # Testing loop
-for episode in range(10):  # Test for 10 episodes
+for episode in range(100):  # Test for 10 episodes
     state = env.reset()  # Reset the environment to the starting state
     done = False
     while not done:  # Run until the episode is done
