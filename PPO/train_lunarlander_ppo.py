@@ -29,7 +29,7 @@ def train():
 
     # action space dimension
     action_dim = env.action_space.n
-
+    print("State: ", state_dim,"\t\tAction: ", action_dim)
     # Setup logging directory
     log_dir = "training_logs"
     if not os.path.exists(log_dir):
@@ -104,7 +104,7 @@ def train():
                 current_ep_reward,
                 avg_reward,
                 mean_reward_100, time_step))
-        if(mean_reward_100 >= 200):
+        if mean_reward_100 >= 200:
             print("Solved in {} episodes".format(episode_num))
             break
         episode_num += 1  # Increment episode counter
