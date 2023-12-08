@@ -38,7 +38,7 @@ To test a trained agent, ensure you're in the correct directory and execute the 
 cd DQN
 python3 test_lunarlander_dqn.py
 ```
-Make sure to replace DQN with the appropriate folder name as per the agent you wish to test.
+Make sure to replace DQN with the appropriate name as per the agent you wish to test.
 
 ### Visualizing Performance
 To visualize the training and testing logs with plotted figures, run the following command within any of the algorithm directories:
