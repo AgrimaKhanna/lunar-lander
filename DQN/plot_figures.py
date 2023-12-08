@@ -34,4 +34,4 @@ if __name__ == '__main__':
     if not os.path.exists(plot_dir):
         os.makedirs(plot_dir)
     plot_training_rewards("plots/training_log.png")
-    plot_testing_rewards("plots/testing_log.png")
+    # plot_testing_rewards("plots/testing_log.png")
