@@ -6,12 +6,11 @@ import warnings
 import torch
 import numpy as np
 import gym
-from ppo_agent import PPO
+from ppo_discrete_agent import PPO
 
 warnings.filterwarnings("ignore")
 
 def train():
-    has_continuous_action_space = False
     max_ep_len = 300  # max timesteps in one episode
     max_training_timesteps = int(1e6)  # break training loop if timeteps > max_training_timesteps
     checkpt = int(5e4)  # save model frequency (in num timesteps)
@@ -40,7 +39,7 @@ def train():
     directory = "models"
     if not os.path.exists(directory):
         os.makedirs(directory)  # Create the directory if it doesn't exist
-    checkpoint_path = directory + "/LunarLander_ppo_weights.pth"  # Checkpoint file path
+    checkpoint_path = directory + "/LunarLander_ppo_discrete_weights.pth"  # Checkpoint file path
 
     # Initialize the PPO agent
     ppo_agent = PPO(state_dim, action_dim, lr_actor, lr_critic, gamma, k_epochs, eps_clip)
@@ -95,6 +94,7 @@ def train():
         mean_reward_100 = np.mean(rewards[-100:])  # Running mean of last 100 episodes
         mean_reward_100 = round(mean_reward_100, 4)
         current_ep_reward = round(current_ep_reward, 4)
+        reward = reward + 100
         log_f.write('{},{},{},{}\n'.format(episode_num, current_ep_reward, avg_reward, mean_reward_100))
         log_f.flush()  # Flush the log file buffer
         # Print episode statistics

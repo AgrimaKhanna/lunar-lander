@@ -17,7 +17,7 @@ num_episodes = 1000
 load_checkpoint = False
 success_threshold = 200.0
 environment_name = 'LunarLanderContinuous-v2'
-env = gym.make(environment_name)
+env = gym.make(environment_name, render_mode='human')
 
 agent_args = {
     'num_steps': 1000000,
@@ -64,9 +64,6 @@ def train_agent():
         episode_critic_loss, episode_actor_loss = 0.0, 0.0
 
         while not done:
-            if os.environ.get('RENDER') == "t":
-                env.render()
-
             action = agent.choose_action(state)
             action = np.squeeze(action)
             next_state, reward, done, _, _ = env.step(action)

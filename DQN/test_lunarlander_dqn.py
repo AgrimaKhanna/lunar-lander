@@ -6,7 +6,7 @@ import os
 
 warnings.filterwarnings("ignore")
 
-env = gym.make('LunarLander-v2')
+env = gym.make('LunarLander-v2', render_mode='human')
 state_size = env.observation_space.shape[0]
 action_size = env.action_space.n
 seed = 0

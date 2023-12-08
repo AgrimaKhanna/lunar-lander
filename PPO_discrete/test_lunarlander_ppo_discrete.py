@@ -5,19 +5,19 @@ from datetime import datetime
 import torch
 import numpy as np
 import gym
-from ppo_agent import PPO
+from ppo_discrete_agent import PPO
 
 def test():
 
     max_ep_len = 300
     total_test_episodes = 100    # total num of testing episodes
-    K_epochs = 80               # update policy for K epochs
+    K_epochs = 30               # update policy for K epochs
     eps_clip = 0.2              # clip parameter for PPO
     gamma = 0.99                # discount factor
     lr_actor = 0.0003           # learning rate for actor
     lr_critic = 0.001           # learning rate for critic
 
-    env = gym.make("LunarLander-v2")
+    env = gym.make("LunarLander-v2", render_mode='human')
 
     # state space dimension
     state_dim = env.observation_space.shape[0]
@@ -27,7 +27,7 @@ def test():
 
     # initialize a PPO agent
     ppo_agent = PPO(state_dim, action_dim, lr_actor, lr_critic, gamma, K_epochs, eps_clip)
-    checkpoint_path = "models/lunarlander_ppo_weights.pth"
+    checkpoint_path = "models/lunarlander_ppo_discrete_weights.pth"
     ppo_agent.load(checkpoint_path)
 
     test_running_reward = 0
